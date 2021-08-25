@@ -129,7 +129,7 @@ classdef agent
             
         end
         
-        % function  CALCDIFFPOTENTIALU calculate the potential U used in
+        % function  CALCDIFFPOTENTIALU calculate the potential U1 used in
         % control stage
         function DiffPotential=CalcDiffPotentialU(obj,obj_self)
             %             obj=obj_all;
@@ -171,7 +171,7 @@ classdef agent
                 end
                 u_i=u_i+obj(i).k4*(vec__phi(obj(i).Position,obj(i).Kernels,obj(i).Gamma,obj(i).sigma)./obj(i).sigma.^2.*(-obj(i).Position+obj(i).Kernels))'*obj(i).Theta_est;
                 gamma_old=obj(i).gamma;
-                obj(i).gamma=obj(i).gamma*1/1.00001;
+                obj(i).gamma=obj(i).gamma*1/1;
                 obj(i).v=obj(i).gamma/delta_t*(delta_t/gamma_old*obj(i).v+gamma_old*u_i);
             end
         end
