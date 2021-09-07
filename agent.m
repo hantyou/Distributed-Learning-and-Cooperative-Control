@@ -30,6 +30,7 @@ classdef agent
         k_di % a scalar of the importance of speed feedback in control stage
         k3 % a scalar of the importance of flock speed in control stage 
         k4 % a scalar of the importance of field gradient in control stage
+        PastPositions 
     end
     
     methods
@@ -133,8 +134,8 @@ classdef agent
         % control stage
         function DiffPotential=CalcDiffPotentialU(obj,obj_self)
             %             obj=obj_all;
-            alpha=1;
-            beta=0.1;
+            alpha=0.10;
+            beta=1;
             DiffPotential=[0,0];
             k1=9;
             k2=0;
@@ -153,7 +154,7 @@ classdef agent
             PotentialBorder1=-beta/(obj_self.Position(1)-obj_self.BorderLimitX(1))^order+beta/(obj_self.Position(1)-obj_self.BorderLimitX(2))^order;
             PotentialBorder2=-beta/(obj_self.Position(2)-obj_self.BorderLimitY(1))^order+beta/(obj_self.Position(2)-obj_self.BorderLimitY(2))^order;
             PotentialBorder=[PotentialBorder1,PotentialBorder2];
-            PotentialBorder(abs(PotentialBorder)>50)=PotentialBorder(abs(PotentialBorder)>10)*0.1;
+            PotentialBorder(abs(PotentialBorder)>50)=PotentialBorder(abs(PotentialBorder)>50)*0.1;
             DiffPotential=k1*PotentialInner+k2*PotentialBorder;
         end
         
@@ -161,17 +162,17 @@ classdef agent
         % agents
         function obj=GenerateControl(obj)
             N=length(obj);
-            k_di=0.5*eye(2);
+            k_di=1.5*eye(2);
             delta_t=obj(1).delta_t;
             for i=1:N
                 DiffPotential=1*obj.CalcDiffPotentialU(obj(i));
-                u_i=-1*DiffPotential'-k_di*(delta_t/obj(i).gamma)*obj(i).v;
+                u_i=-0.1*DiffPotential'-k_di*(delta_t/obj(i).gamma)*(obj(i).v);
                 for j=obj(i).Neighbour
                     u_i=u_i+obj(i).k3*(delta_t*(obj(j).v-obj(i).v)/obj(i).gamma);
                 end
                 u_i=u_i+obj(i).k4*(vec__phi(obj(i).Position,obj(i).Kernels,obj(i).Gamma,obj(i).sigma)./obj(i).sigma.^2.*(-obj(i).Position+obj(i).Kernels))'*obj(i).Theta_est;
                 gamma_old=obj(i).gamma;
-                obj(i).gamma=obj(i).gamma*1/1;
+                obj(i).gamma=obj(i).gamma*1/1.005;
                 obj(i).v=obj(i).gamma/delta_t*(delta_t/gamma_old*obj(i).v+gamma_old*u_i);
             end
         end
