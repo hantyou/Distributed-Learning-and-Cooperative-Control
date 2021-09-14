@@ -11,10 +11,11 @@ Kernels=[kron(linspace(reg_x(1),reg_x(2),5)/1.1,[1 1 1 1 1])',repmat(linspace(re
 % Gamma=0.1*abs(randn(m,1)); % Gamma in the RBFs
 Gamma=0.1*ones(m,1);
 % sigma=2*abs(randn(m,1)); % sigma in the RBFs
-sigma=2*ones(m,1);
+sigma=1*ones(m,1);
 % Theta=0.1*abs(randn(m,1)); % scaling factors of RBFs
 Theta=zeros(m,1);
-Theta(19)=3; % This set a peak for the field
+Theta(19)=5; % This set a peak for the field
+Theta(7)=5;
 % This returns the true scalar value of the whole field
 mesh_value = generate_region(reg_x,reg_y,m,Gamma,sigma,Kernels,Theta);
 
@@ -38,7 +39,7 @@ s=1; % Sampling rate of agents
 sigma_w=1; % variance of the sampling noise
 %% Agents initialization
 t=0;
-InitialPosi=-2+randn(N,2); % Initialize the agent positions
+InitialPosi=randn(N,2); % Initialize the agent positions
 InitialPosi(InitialPosi>5)=4; % correct positions outside the border
 InitialPosi(InitialPosi<-5)=-4;
 Agents=agent.empty(N,0);
@@ -58,7 +59,7 @@ for n=1:N
     Agents(n).v=[0;0];
     Agents(n).gamma=0.2;
     Agents(n).k3=0.1;
-    Agents(n).k4=0.2;
+    Agents(n).k4=0.1;
     Agents(n).delta_t=1;
     Agents(n).BorderLimitX=reg_x;
     Agents(n).BorderLimitY=reg_y;
@@ -98,7 +99,7 @@ while IterationFlag
     if ~mod(IterCount,50)
         figure(2),
         mesh_value_est_1 = generate_region(reg_x,reg_y,m,Gamma,sigma,Kernels,Agents(1).Theta_est);
-        image(linspace(reg_x(1),reg_x(2),M),linspace(reg_y(2),reg_y(1),M),mesh_value_est_1);
+        image(linspace(reg_x(1),reg_x(2),M),linspace(reg_y(2),reg_y(1),M),mesh_value_est_1,'CDataMapping','scaled');
         hold on;
         for i=1:N
             temp=Agents(i).PastPositions;
@@ -125,9 +126,9 @@ for i=1:N
     temp=Agents(i).PastPositions;
     plot(temp(:,1),temp(:,2),'r');
 end
+scatter(Kernels(:,1),Kernels(:,2),'ro');
 scatter(Posi(:,1),Posi(:,2),'g*');
 scatter(Agents(1).Position(1),Agents(1).Position(2),'r*');
-scatter(Kernels(:,1),Kernels(:,2),'ro');
 title("Final positions of agents and estimated field of agent-1")
 hold off;
 
